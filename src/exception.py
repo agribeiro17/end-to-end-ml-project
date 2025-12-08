@@ -1,5 +1,5 @@
 import sys # provides various funtions and variables that are used to manipulate different parts of the Python runtime environment
-import logging
+from logger import logging
 def error_message_details(error, error_detail:sys):
     '''
     Docstring for error_message_details
@@ -44,4 +44,9 @@ class CustomException(Exception):
         '''
         return self.error_message
 
-
+# if __name__ == "__main__":
+#     try:
+#         a = 1/0
+#     except Exception as e:
+#         logging.info("Divide by zero exception occurred")
+#         raise CustomException(e, sys)
