@@ -1,5 +1,5 @@
 import sys # provides various funtions and variables that are used to manipulate different parts of the Python runtime environment
-from logger import logging
+from src.logger import logging
 def error_message_details(error, error_detail:sys):
     '''
     Docstring for error_message_details
