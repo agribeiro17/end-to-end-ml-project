@@ -6,6 +6,13 @@ import numpy as np
 import pandas as pd
 from src.exception import CustomException
 from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
+
+from src.logger import logging
+import warnings
+from sklearn.exceptions import ConvergenceWarning
+
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 def save_object(file_path, obj):
     '''
@@ -24,13 +31,19 @@ def save_object(file_path, obj):
     except Exception as e:
         raise CustomException(e, sys)
 
-def evaluate_models(X_train, y_train, X_test, y_test, models):
+def evaluate_models(X_train, y_train, X_test, y_test, models, params):
     try:
         report = {}
         for i in range(len(list(models))):
             model = list(models.values())[i] # Getting every model
+            para = params[list(models.keys())[i]]
             
-            model.fit(X_train, y_train) # Train the model
+            grid_search = GridSearchCV(model, para, cv=3)
+            grid_search.fit(X_train, y_train)
+            
+            model.set_params(**grid_search.best_params_)
+            model.fit(X_train, y_train)
+            #model.fit(X_train, y_train) # Train the model
             
             y_train_pred = model.predict(X_train)
             
@@ -39,6 +52,13 @@ def evaluate_models(X_train, y_train, X_test, y_test, models):
             train_model_score = r2_score(y_train, y_train_pred)
             
             test_model_score = r2_score(y_test, y_test_pred)
+            
+            logging.info(
+                f"Model: {model} | "
+                f"Train R2: {train_model_score:.2f} |"
+                f"Test R2: {test_model_score:.2f} |"
+                f"Best Params: {grid_search.best_params_}"
+            )
             
             report[list(models.keys())[i]] = test_model_score
         
